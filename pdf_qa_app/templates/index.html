@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Question & Answer Assistant</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📄 PDF Question & Answer Assistant</h1>
+            <p>Upload a PDF and ask questions about its content using AI</p>
+        </header>
+
+        <!-- File Upload Section -->
+        <div class="upload-section">
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-content">
+                    <div class="upload-icon">📁</div>
+                    <h3>Drop your PDF here or click to browse</h3>
+                    <p>Maximum file size: 16MB</p>
+                    <input type="file" id="pdfFile" accept=".pdf" style="display: none;">
+                    <button id="browseBtn" class="btn btn-primary">Browse Files</button>
+                </div>
+            </div>
+            <div id="uploadStatus" class="status-message"></div>
+        </div>
+
+        <!-- PDF Preview Section -->
+        <div id="previewSection" class="preview-section" style="display: none;">
+            <h3>📖 Document Preview</h3>
+            <div id="documentInfo" class="document-info"></div>
+            <div id="textPreview" class="text-preview"></div>
+        </div>
+
+        <!-- Model Selection -->
+        <div id="modelSection" class="model-section" style="display: none;">
+            <h3>🤖 Select AI Model</h3>
+            <div class="model-options">
+                <label class="model-option">
+                    <input type="radio" name="model" value="openai/gpt-3.5-turbo" checked>
+                    <span>GPT-3.5 Turbo (Fast & Efficient)</span>
+                </label>
+                <label class="model-option">
+                    <input type="radio" name="model" value="openai/gpt-4">
+                    <span>GPT-4 (More Accurate)</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- Question Section -->
+        <div id="questionSection" class="question-section" style="display: none;">
+            <h3>❓ Ask Questions About Your Document</h3>
+            <div class="question-input-area">
+                <textarea 
+                    id="questionInput" 
+                    placeholder="Enter your question about the PDF content here..."
+                    rows="3"
+                ></textarea>
+                <button id="askBtn" class="btn btn-primary">Ask Question</button>
+            </div>
+        </div>
+
+        <!-- Answer Section -->
+        <div id="answerSection" class="answer-section" style="display: none;">
+            <h3>💡 Answer</h3>
+            <div id="answerContent" class="answer-content"></div>
+        </div>
+
+        <!-- Chat History -->
+        <div id="chatHistory" class="chat-history" style="display: none;">
+            <h3>💬 Chat History</h3>
+            <div id="chatMessages" class="chat-messages"></div>
+        </div>
+
+        <!-- Control Buttons -->
+        <div id="controlSection" class="control-section" style="display: none;">
+            <button id="clearBtn" class="btn btn-secondary">Clear Session</button>
+            <button id="newQuestionBtn" class="btn btn-primary">Ask Another Question</button>
+        </div>
+
+        <!-- Loading Spinner -->
+        <div id="loadingSpinner" class="loading-spinner" style="display: none;">
+            <div class="spinner"></div>
+            <p>Processing your question...</p>
+        </div>
+    </div>
+
+    <footer>
+        <p>Powered by OpenRouter.ai | Built with Flask & Python</p>
+    </footer>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
