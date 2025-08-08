@@ -4,6 +4,7 @@ import requests
 from flask import Flask, request, render_template, jsonify
 from werkzeug.utils import secure_filename
 import json
+import openai
 
 app = Flask(__name__)
 app.secret_key = 'your-secret-key-change-this'
@@ -14,8 +15,9 @@ app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
 # OpenRouter configuration - YOU NEED TO CHANGE THIS
-OPENAI_API_KEY = "sk-proj-5-sjp3xXqz9VG6lCTvYhjGX2Yypyp_r4QBdl"  # Replace with your actual API key
-OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1/chat/completions"
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")  # Replace with your actual API key
+openai.api_key = OPENAI_API_KEY
+
 
 # Store PDF content in memory
 pdf_content = {}
@@ -37,14 +39,10 @@ def extract_pdf_text(pdf_path):
         print(f"Error extracting PDF text: {e}")
         return None
 
-def query_openrouter(question, context, model="openai/gpt-3.5-turbo"):
-    """Query OpenRouter API with context and question"""
-    headers = {
-        "Authorization": f"Bearer {OPENROUTER_API_KEY}",
-        "Content-Type": "application/json"
-    }
-    
-    prompt = f"""Based on the following document content, please answer the user's question accurately and concisely.
+def query_openai(question, context, model="gpt-3.5-turbo"):
+    """Query OpenAI API with context and question"""
+    try:
+        prompt = f"""Based on the following document content, please answer the user's question accurately and concisely.
 
 Document Content:
 {context[:4000]}
@@ -53,25 +51,40 @@ Question: {question}
 
 Please provide a clear and helpful answer based only on the information in the document. If the answer cannot be found in the document, please say so."""
 
-    data = {
-        "model": model,
-        "messages": [
-            {"role": "system", "content": "You are a helpful assistant that answers questions based on provided document content."},
-            {"role": "user", "content": prompt}
-        ],
-        "temperature": 0.7,
-        "max_tokens": 500
-    }
+        response = openai.ChatCompletion.create(
+            model=model,
+            messages=[
+                {"role": "user", "content": prompt}
+            ],
+            max_tokens=500,
+            temperature=0.7
+        )
+        
+        return response.choices[0].message.content.strip()
     
-    try:
-        response = requests.post(OPENROUTER_BASE_URL, headers=headers, json=data)
-        if response.status_code == 200:
-            result = response.json()
-            return result['choices'][0]['message']['content']
-        else:
-            return f"Error: {response.status_code} - {response.text}"
     except Exception as e:
-        return f"Error querying API: {str(e)}"
+        print(f"Error querying OpenAI: {e}")
+        return "Sorry, I encountered an error while processing your question."
+
+    # data = {
+    #     "model": model,
+    #     "messages": [
+    #         {"role": "system", "content": "You are a helpful assistant that answers questions based on provided document content."},
+    #         {"role": "user", "content": prompt}
+    #     ],
+    #     "temperature": 0.7,
+    #     "max_tokens": 500
+    # }
+    
+    # try:
+    #     response = requests.post(OPENROUTER_BASE_URL, headers=headers, json=data)
+    #     if response.status_code == 200:
+    #         result = response.json()
+    #         return result['choices'][0]['message']['content']
+    #     else:
+    #         return f"Error: {response.status_code} - {response.text}"
+    # except Exception as e:
+    #     return f"Error querying API: {str(e)}"
 
 @app.route('/')
 def index():
@@ -124,7 +137,7 @@ def ask_question():
         return jsonify({'error': 'Please enter a question'}), 400
     
     # Query OpenRouter API
-    answer = query_openrouter(question, pdf_content[current_filename], model)
+    answer = query_openai(question, pdf_content[current_filename], model)
     
     return jsonify({
         'question': question,
@@ -155,4 +168,5 @@ if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
     # For Vercel deployment
 application = app
+
 
