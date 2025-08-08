@@ -14,7 +14,7 @@ app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
 # OpenRouter configuration - YOU NEED TO CHANGE THIS
-OPENROUTER_API_KEY = "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"  # Replace with your actual API key
+OPENAI_API_KEY = "sk-proj-5-sjp3xXqz9VG6lCTvYhjGX2Yypyp_r4QBdl"  # Replace with your actual API key
 OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1/chat/completions"
 
 # Store PDF content in memory
@@ -155,3 +155,4 @@ if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
     # For Vercel deployment
 application = app
+
