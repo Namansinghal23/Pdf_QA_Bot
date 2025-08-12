@@ -51,7 +51,7 @@ Question: {question}
 
 Please provide a clear and helpful answer based only on the information in the document. If the answer cannot be found in the document, please say so."""
 
-        response = openai.ChatCompletion.create(
+        response = openai.chat.completions.create(
             model=model,
             messages=[
                 {"role": "user", "content": prompt}
@@ -168,5 +168,6 @@ if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
     # For Vercel deployment
 application = app
+
 
 
