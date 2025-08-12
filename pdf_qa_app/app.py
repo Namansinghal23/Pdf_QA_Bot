@@ -63,40 +63,10 @@ def query_gemini(question, context):
         response = requests.post(url, json=data)
         result = response.json()
         return result['candidates'][0]['content']['parts'][0]['text']
-    except:
-        return "Error occurred"
-
-Document Content:
-{context[:4000]}
-
-Question: {question}
-
-Please provide a clear and helpful answer based only on the information in the document. If the answer cannot be found in the document, please say so."""
-
-        response = openai.chat.completions.create(
-            model=model,
-            messages=[
-                {"role": "user", "content": prompt}
-            ],
-            max_tokens=500,
-            temperature=0.7
-        )
-        
-        return response.choices[0].message.content.strip()
     
     except Exception as e:
         print(f"Error querying OpenAI: {e}")
         return "Sorry, I encountered an error while processing your question."
-
-    # data = {
-    #     "model": model,
-    #     "messages": [
-    #         {"role": "system", "content": "You are a helpful assistant that answers questions based on provided document content."},
-    #         {"role": "user", "content": prompt}
-    #     ],
-    #     "temperature": 0.7,
-    #     "max_tokens": 500
-    # }
     
     # try:
     #     response = requests.post(OPENROUTER_BASE_URL, headers=headers, json=data)
@@ -191,6 +161,7 @@ if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
     # For Vercel deployment
 application = app
+
 
 
 
