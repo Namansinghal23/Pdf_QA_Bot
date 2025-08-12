@@ -4,7 +4,7 @@ import requests
 from flask import Flask, request, render_template, jsonify
 from werkzeug.utils import secure_filename
 import json
-import openai
+#import openai
 
 app = Flask(__name__)
 app.secret_key = 'your-secret-key-change-this'
@@ -15,8 +15,9 @@ app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
 # OpenRouter configuration - YOU NEED TO CHANGE THIS
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")  # Replace with your actual API key
-openai.api_key = OPENAI_API_KEY
+# OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")  # Replace with your actual API key
+# openai.api_key = OPENAI_API_KEY
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 
 
 # Store PDF content in memory
@@ -39,10 +40,31 @@ def extract_pdf_text(pdf_path):
         print(f"Error extracting PDF text: {e}")
         return None
 
-def query_openai(question, context, model="gpt-3.5-turbo"):
-    """Query OpenAI API with context and question"""
+# def query_openai(question, context, model="gpt-3.5-turbo"):
+#     """Query OpenAI API with context and question"""
+#     try:
+#         prompt = f"""Based on the following document content, please answer the user's question accurately and concisely.
+
+def query_gemini(question, context):
+    """Simple working Gemini API call"""
+    import requests
+    import json
+    
+    api_key = os.getenv("GOOGLE_API_KEY")
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key={api_key}"
+    
+    prompt = f"Answer this question based on the document: {question}\n\nDocument: {context[:3000]}"
+    
+    data = {
+        "contents": [{"parts": [{"text": prompt}]}]
+    }
+    
     try:
-        prompt = f"""Based on the following document content, please answer the user's question accurately and concisely.
+        response = requests.post(url, json=data)
+        result = response.json()
+        return result['candidates'][0]['content']['parts'][0]['text']
+    except:
+        return "Error occurred"
 
 Document Content:
 {context[:4000]}
@@ -137,7 +159,8 @@ def ask_question():
         return jsonify({'error': 'Please enter a question'}), 400
     
     # Query OpenRouter API
-    answer = query_openai(question, pdf_content[current_filename], model)
+    # answer = query_openai(question, pdf_content[current_filename], model)
+    answer = query_gemini(question, pdf_content[current_filename])
     
     return jsonify({
         'question': question,
@@ -168,6 +191,7 @@ if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
     # For Vercel deployment
 application = app
+
 
 
 
