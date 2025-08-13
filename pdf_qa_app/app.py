@@ -17,8 +17,7 @@ os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 # OpenRouter configuration - YOU NEED TO CHANGE THIS
 # OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")  # Replace with your actual API key
 # openai.api_key = OPENAI_API_KEY
-GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
-
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 # Store PDF content in memory
 pdf_content = {}
@@ -121,7 +120,7 @@ def ask_question():
     
     # Query OpenRouter API
     # answer = query_openai(question, pdf_content[current_filename], model)
-    answer = query_gemini(question, pdf_content[current_filename])
+    answer = query_openai_working(question, pdf_content[current_filename])
     
     return jsonify({
         'question': question,
@@ -152,6 +151,7 @@ if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
     # For Vercel deployment
 application = app
+
 
 
 
