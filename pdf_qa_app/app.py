@@ -58,13 +58,13 @@ Question: {question}
 Answer:"""
     
     try:
-        response = openai.Completion.create(
-            engine="text-davinci-003",
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo-instruct",
             prompt=prompt,
             max_tokens=300,
             temperature=0.7
         )
-        return response.choices[0].text.strip()
+        return response.choices[0].message.content.strip()
     except Exception as e:
         return f"Error: {str(e)}"
 
@@ -151,6 +151,7 @@ if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
     # For Vercel deployment
 application = app
+
 
 
 
