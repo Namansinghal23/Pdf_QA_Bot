@@ -45,38 +45,29 @@ def extract_pdf_text(pdf_path):
 #     try:
 #         prompt = f"""Based on the following document content, please answer the user's question accurately and concisely.
 
-def query_gemini(question, context):
-    """Simple working Gemini API call"""
-    import requests
-    import json
+def query_openai_working(question, context):
+    import openai
     
-    api_key = os.getenv("GOOGLE_API_KEY")
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key={api_key}"
+    openai.api_key = os.getenv("OPENAI_API_KEY")
     
-    prompt = f"Answer this question based on the document: {question}\n\nDocument: {context[:3000]}"
-    
-    data = {
-        "contents": [{"parts": [{"text": prompt}]}]
-    }
+    prompt = f"""Based on this PDF content, answer the question:
+
+PDF Content: {context[:2000]}
+
+Question: {question}
+
+Answer:"""
     
     try:
-        response = requests.post(url, json=data)
-        result = response.json()
-        return result['candidates'][0]['content']['parts'][0]['text']
-    
+        response = openai.Completion.create(
+            engine="text-davinci-003",
+            prompt=prompt,
+            max_tokens=300,
+            temperature=0.7
+        )
+        return response.choices[0].text.strip()
     except Exception as e:
-        print(f"Error querying OpenAI: {e}")
-        return "Sorry, I encountered an error while processing your question."
-    
-    # try:
-    #     response = requests.post(OPENROUTER_BASE_URL, headers=headers, json=data)
-    #     if response.status_code == 200:
-    #         result = response.json()
-    #         return result['choices'][0]['message']['content']
-    #     else:
-    #         return f"Error: {response.status_code} - {response.text}"
-    # except Exception as e:
-    #     return f"Error querying API: {str(e)}"
+        return f"Error: {str(e)}"
 
 @app.route('/')
 def index():
@@ -161,6 +152,7 @@ if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
     # For Vercel deployment
 application = app
+
 
 
 
